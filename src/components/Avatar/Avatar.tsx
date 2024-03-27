@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react"
-import { Avatar as AvatarMui, SxProps, Theme } from "@mui/material"
+import { Avatar as AvatarMUI, SxProps, Theme } from "@mui/material"
 
 export const Avatar: FC<{
     photoS3?: boolean | null;
@@ -13,8 +13,10 @@ export const Avatar: FC<{
 
     },[])
     return (
-        <AvatarMui 
+        <AvatarMUI>
+            
+        </AvatarMUI>
         
-        />
+        
     )
 }
