@@ -1,8 +1,12 @@
 
 import { defaultTheme } from "@/assets/themes";
 import { FC } from "react";
-import { useAppSelector } from "../../..";
+
+import { Container } from "@mui/material";
 
 export const Theme: FC = ({}) => {
-    const theme = defaultTheme(useAppSelector)
+    
+    return (
+        <Container></Container>
+    )
 }
