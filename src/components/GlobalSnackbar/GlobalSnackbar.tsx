@@ -1,5 +1,13 @@
-import { OptionsObject, SnackbarKey, SnackbarMessage, useSnackbar } from "notistack";
+import { 
+    OptionsObject, 
+    SnackbarKey, 
+    SnackbarMessage, 
+    SnackbarProvider, 
+    useSnackbar } from "notistack";
 
+import { IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close"
+import { FC, ReactNode } from "react";
 
 let snackFunction:
 | ((
@@ -35,4 +43,28 @@ export const GlobalSnackbar = () => {
     snackFunction = enqueueSnackbar
 
     return null
+}
+
+export const CloseSnackButton: FC<
+    {snackKey: string | number | undefined} & OptionsObject
+> = ({snackKey}) => {
+    const {closeSnackbar} = useSnackbar()
+    return (
+        <IconButton
+        size="small"
+        color="inherit"
+        >
+            <CloseIcon />
+        </IconButton>
+    )
+}
+
+export const  GlobalSnackbarProvider:FC = ({children}:any) => {
+    return (
+        <SnackbarProvider
+        action={(key): ReactNode => <CloseSnackButton snackKey={key} />}
+        >
+        {children}
+        </SnackbarProvider>
+    )
 }
