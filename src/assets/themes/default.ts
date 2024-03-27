@@ -1,4 +1,4 @@
-import { ITheme } from "@/store/modules/layout/types";
+import { ITheme } from "@/store/modules/layout";
 import { createTheme } from "@mui/material";
 import { blueGrey, green, grey, lime, red } from "@mui/material/colors";
 
