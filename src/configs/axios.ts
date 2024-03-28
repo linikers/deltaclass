@@ -22,6 +22,7 @@ interface MyAxiosCacheAdapterOptions extends IAxiosCacheAdapterOptions {
     uuid: string;
 }
 
+//finalizar
 export const refreshUser = async () => {
 
 }
