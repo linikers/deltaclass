@@ -72,10 +72,44 @@ export class LsCache {
     }
 
     private flushExpiredItem(key: string) {
-        const
+        const exprKey = this.expirationKey(key);
+        const expr = this.getItem(exprKey)
+        if(expr) {
+            const expirationTime = parseInt(expr, this.EXPIRY_RADIX)
+            if(this.currentTime() >= expirationTime) {
+                this.removeItem(key)
+                this.removeItem(exprKey)
+                return true
+            }
+        }
     }
 
+    private supportsStorange() {
+        const key = "__lscachetest__";
+        const value = key;
 
+        if(this.hasSupport !== undefined) {
+            return this.hasSupport
+        }
+
+        try {
+            this.setItem(key, value);
+            this.removeItem(key);
+            this.hasSupport = true;
+        } catch (error) {
+            //Se atingirmos o limite e não tivermos um localStorage vazio, isso significa que temos suporte
+            if(this.isOutOfSpace(error as Error) && this.storage.length) {
+                this.hasSupport = true;
+            } else {
+                this.hasSupport = false;
+            }
+        }
+        return this.hasSupport
+    }
+
+    private escapeRegExpSpecialCharacters(text: string) {
+        return text.replace(/[[\]{}()*+?.\\^$|]/g, "\\$&");
+    }
     private expirationKey(key: string) {
         return key + this.CACHE_SUFFIX
     }
@@ -92,6 +126,19 @@ export class LsCache {
             this.hasSupportJson = JSON != null && JSON != undefined;
         }
         return this.hasSupportJson;
+    }
+
+
+
+    private eachKey(fn: (key: string, exprKey: string) => void) {
+        const prefixRegExp = new RegExp(
+            "^" +
+            this.CACHE_PREFIX +
+            this.escapeRegExpSpecialCharacters(this.cacheBucket) +
+            "(.*)"   
+        );
+        //Primeiro identificamos quais chaves processar
+        const keysToProcess = []
     }
 
 }
