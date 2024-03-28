@@ -6,17 +6,19 @@ export class LsCache {
     cacheBucket = "";
     expiryMilliseconds = 60 * 1000;
     warnings = false;
-    maxDate = this.calculateMaxDate
+    maxDate = this.calculateMaxDate(this.expiryMilliseconds)
 
     constructor({
         type,
         cacheBucket,
         expiryMilliseconds,
+        warnings,
 
     } : {
         type: "local" | "session";
         cacheBucket?: string;
-        expiryMillisconds?: number;
+        expiryMilliseconds?: number;
+        warnings?: boolean;
 
     }){
         this.type = type
@@ -26,8 +28,16 @@ export class LsCache {
             this.storage = sessionStorage
         }
         if (cacheBucket) this.cacheBucket = this.cacheBucket;
-        if(expiryMilliseconds)
-        if()
+        if(expiryMilliseconds) this.expiryMilliseconds = expiryMilliseconds;
+        if(warnings != undefined) this.warnings = warnings;
+    }
+
+    private warm(message: string, error?: Error) {
+        if(!this.warnings) return;
+        if(!("console" in window) || typeof window.console.warn !== "function")
+            return;
+        window.console.warn("lscache -" + message);
+        if(error)window.console.warn("lscache - The error was: " + error.message)
     }
 
     private calculateMaxDate(expiryMilliseconds: number) {
