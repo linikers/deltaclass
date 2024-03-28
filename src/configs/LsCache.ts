@@ -150,8 +150,58 @@ export class LsCache {
                         keysToProcess.push(extractedKey)
                     }
                 }
+                //Então aplicamos a função de processamento a cada chave
+                for(i=0; i < keysToProcess.length; i++) {
+                    fn(keysToProcess[i], this.expirationKey(keysToProcess[i]))
+                }
             }
         }
+
+       
+    }
+    public  set<T>(key: string, value: T, time?: number): boolean {
+            if(!this.supportsStorange()) return false
+
+            if(!this.supportsJSON()) return false
+
+            let valueForStorage: string;
+            try {
+                valueForStorage = JSON.stringify(value)
+            } catch (error) {
+                return false
+            }
+
+            try {
+                
+            } catch (error) {
+                if(this.isOutOfSpace(error as Error)) {
+                    const storedKeys: {
+                        key: string;
+                        size: number;
+                        expiration: number;
+                    }[] = [];
+                    let storedKey;
+                    this.eachKey((key:string, exprKey: string) => {
+                        const expStr = this.getItem(exprKey);
+                        let expiration: number;
+                        if(expStr) {
+                            expiration = parseInt(expStr, this.EXPIRY_RADIX)
+                        } else {
+                            expiration = this.maxDate
+                        }
+                        storedKey.push({
+                            key: key,
+                            size: (this.getItem(key) || "").length,
+                            expiration: expiration,
+                        })
+                    })
+                    storedKeys.sort(function(a, b) {
+                        return b.expiration - a.expiration;
+                    })
+
+                    let targetSize = (valueForStorage || "").length
+                }
+            }
     }
 
 }
