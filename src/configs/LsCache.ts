@@ -1,3 +1,6 @@
+import { Key } from "@mui/icons-material";
+import { keys } from "@mui/system";
+
 export class LsCache {
     hasSupport: boolean | undefined;
     hasSupportJson: boolean | undefined;
@@ -200,10 +203,99 @@ export class LsCache {
                     })
 
                     let targetSize = (valueForStorage || "").length
+                    while (storedKeys.length && targetSize > 0) {
+                        storedKey = storedKeys.pop();
+                        if(storedKey) {
+                            this.warm(
+                                "Cache is full, removing item with key '" + storedKey.key + "'"
+                            )
+                            this.flushItem(storedKey.key)
+                            targetSize-= storedKey.size
+                        }
+                    }
+                    try {
+                        
+                    } catch (error) {
+                        this.warm(
+                            "Could not add item with key '" + key + "', perhaps it's too big?",
+                            error as Error
+                        );
+                        return false
+                    }
                 }
             }
+
+            if(time) {
+                this.setItem(
+                    this.expirationKey(key),
+                    (this.currentTime() + time).toString(this.EXPIRY_RADIX)
+                );
+            } else {
+                this.removeItem(this.expirationKey(key))
+            }
+            return true
     }
 
+    public get<T>(key:string): T | string | null {
+        if(!this.supportsStorange()) return null
+
+        if(this.flushExpiredItem(key)) {
+            return null
+        }
+
+        const value = this.getItem(key)
+        if(!value || !this.supportsJSON()){
+            return value
+        }
+
+        try {
+            return JSON.parse(value) as T
+        } catch (error) {
+            return value
+            
+        }
+    }
+
+    
+    public remove(key: string) {
+        if(!this.supportsStorange()) return
+        this.flushItem(key)
+    }
+    public supported() {
+        return this.supportsStorange()
+    }
+    public flush() {
+        if(!this.supportsStorange()) return
+        this.eachKey((key) => {
+            this.flushItem(key)
+        })
+    }
+    public flushExpired() {
+        if(!this.supportsStorange()) return
+        this.eachKey((key) => {
+            this.flushExpiredItem(key)
+        })
+    }
+    public setBucket() {
+        this.cacheBucket = ""
+    }
+    public getExpiryMilliseconds() {
+        return this.expiryMilliseconds;
+      }
+    public setExpiryMilliseconds(milliseconds: number) {
+        this.expiryMilliseconds = milliseconds;
+        this.maxDate = this.calculateMaxDate(this.expiryMilliseconds);
+    }
+    public enableWarnings(enabled: boolean) {
+        this.warnings = enabled;
+    }
 }
 
-//export const cachePhotoUrl =
+export const cachePhotoUrl = new LsCache({
+    type: "session",
+  });
+  
+  export const cacheDados = new LsCache({
+    type: "session",
+  });
+  
