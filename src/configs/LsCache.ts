@@ -138,7 +138,20 @@ export class LsCache {
             "(.*)"   
         );
         //Primeiro identificamos quais chaves processar
-        const keysToProcess = []
+        const keysToProcess: string[] = [];
+        let key: string | null, i;
+        for (i=0; i < this.storage.length; i++) {
+            key = this.storage.key(i)
+            if(key){
+                const mathResult = key.match(prefixRegExp)
+                if(mathResult) {
+                    const extractedKey = mathResult[1]
+                    if(extractedKey && extractedKey.indexOf(this.CACHE_SUFFIX) < 0) {
+                        keysToProcess.push(extractedKey)
+                    }
+                }
+            }
+        }
     }
 
 }
