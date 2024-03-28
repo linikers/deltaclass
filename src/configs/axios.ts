@@ -11,14 +11,19 @@ let count = 0;
 
 interface MemoryStore {
     store: object;
-    //setItem: (key: string) =>
-    
+    setItem: (key: string, value: object) => object;
+    getItem: (key: string) => object;
     removeItem: (key:string) => void;
     clear: () => void;
+    lenght: () => number;
 }
 
 interface MyAxiosCacheAdapterOptions extends IAxiosCacheAdapterOptions {
     uuid: string;
+}
+
+export const refreshUser = async () => {
+
 }
 
 export const interceptorError = async (
@@ -30,11 +35,12 @@ export const interceptorError = async (
         const {
             usuario: {usuario},
         } = store.getState()
+        const errorMessage = error.message || '';
         if (
             response?.status === 401 &&
-            (message.toLowerCase().includes("token") ||
+            (errorMessage.toLowerCase().includes("token") ||
                 response?.statusText == "Unauthorized"   ||
-                response?.data?.error == "jwt expired")  &&
+                errorMessage?.toLowerCase().includes("jwt expired"))  &&
             usuario
         ) {
             if(limit <= count) {
@@ -54,7 +60,9 @@ const invalidate = async (
     request: AxiosRequestConfig<any>,
 ) => {
     if(request.clearCacheEntry) {
-        await (config.store as MemoryStore)
+        await (config.store as MemoryStore).removeItem(
+            (config as MyAxiosCacheAdapterOptions).uuid
+        )
     }
 }
 export const api = setup({
@@ -62,6 +70,30 @@ export const api = setup({
     cache: {
         maxAge: Environment.MILLISECONDS_IN_A_SECONDS,
         exclude: {query: false},
-        //invalidate,
+        invalidate,
     }
 })
+
+export const apiRelatorio = setup({})
+
+export const apiConfig = setup({
+    baseURL: Environment.CONFIG_DELTA_API_URL
+})
+
+export const apiPush = setup({
+    baseURL: Environment.PUSH_DELTA_API_URL,
+})
+
+export const setToken = () => {
+
+}
+
+export const setBaseUrl = (escolaId: string) => {
+    api.defaults.baseURL =  `${Environment.API_URL}/api/${escolaId}`;
+    
+}
+
+api.interceptors.response.use(
+    (success) => success,
+    (error) => interceptorError(error, api)
+)

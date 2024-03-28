@@ -1,4 +1,13 @@
-import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE, persistReducer } from "redux-persist";
+import { 
+    FLUSH, 
+    PAUSE, 
+    PERSIST, 
+    PURGE, 
+    REGISTER, 
+    REHYDRATE, 
+    persistReducer 
+} from "redux-persist";
+
 import storage from "redux-persist/lib/storage";
 import { rootReducer } from "./modules/root_reducer";
 
@@ -7,6 +16,12 @@ import { Environment } from "@/configs/Enviroment";
 import createSagaMiddleware from "redux-saga";
 import { configureStore } from "@reduxjs/toolkit";
 import persistStore from "redux-persist/es/persistStore";
+
+import { 
+    TypedUseSelectorHook, 
+    useDispatch,
+    useSelector } from "react-redux";
+
 
 
 const persistedReducer = persistReducer(
@@ -36,3 +51,10 @@ export const store = configureStore({
 
 export const persistor = persistStore(store)
 
+//sagaMiddleware
+
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+export const useAppDispatch = () => useDispatch<AppDispatch>()
+
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch =  typeof store.dispatch
