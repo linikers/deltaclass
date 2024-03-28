@@ -42,7 +42,11 @@ const buildHashFile = async (file: File): Promise<string> => {
     return SHA256(result_base64 as string).toString()
 }
 
-const sendS3File = async () => {
+const sendS3File = async ({
+    file: selectedFile,
+}:{
+    file: File;
+}) => {
 
 }
 
